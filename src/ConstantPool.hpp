@@ -18,44 +18,44 @@ namespace ccw::tula {
                    || type == ConstantType::InterfaceMethodref;
         }
 
-        inline bool isClassOrIndex() {
+        inline bool isClassOrIndex() const {
             return isClassOrUnresolvedClass() || type == ConstantType::ClassIndex;
         }
 
-        inline bool isClass() {
+        inline bool isClass() const {
             return type == ConstantType::Class;
         }
 
-        inline bool isUnresolvedClass() {
+        inline bool isUnresolvedClass() const {
             return type == ConstantType::UnresolvedClass;
         }
 
-        inline bool isClassOrUnresolvedClass() {
+        inline bool isClassOrUnresolvedClass() const {
             return type == ConstantType::Class
                    || type == ConstantType::UnresolvedClass;
         }
 
-        inline bool isUtf8() {
+        inline bool isUtf8() const {
             return type == ConstantType::Utf8;
         }
 
-        inline bool isInteger() {
+        inline bool isInteger() const {
             return type == ConstantType ::Integer;
         }
 
-        inline bool isLong() {
+        inline bool isLong() const {
             return type == ConstantType ::Long;
         }
 
-        inline bool isDouble() {
+        inline bool isDouble() const {
             return type == ConstantType ::Double;
         }
 
-        inline bool isFloat() {
+        inline bool isFloat() const {
             return type == ConstantType ::Float;
         }
 
-        inline bool isConstantValueType() {
+        inline bool isConstantValueType() const {
             return type == ConstantType::Long
                    || type == ConstantType::Float
                    || type == ConstantType::Double
@@ -99,11 +99,11 @@ namespace ccw::tula {
     public:
         explicit ConstantPool(uint16_t size);
 
-        inline bool isValidIndex(uint16_t index) {
+        inline bool isValidIndex(uint16_t index) const {
             return index > 0 && index <= size;
         }
 
-        uint16_t getSize() {
+        uint16_t getSize() const {
             return size;
         }
 

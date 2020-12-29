@@ -2,15 +2,15 @@
 
 namespace ccw::tula {
 
-    Symbol::~Symbol() {
-        delete bytes;
-    }
-
-    Symbol::Symbol(uint8_t *bytes, uint32_t len) : bytes(bytes), len(len) {
+    Symbol::Symbol(const uint8_t *bytes, size_t len) : len(len) {
         this->bytes = static_cast<uint8_t *>(malloc(len + 1));
         this->bytes[len] = '\0';
         memcpy(this->bytes, bytes, len);
         hashValue = bytesHash(bytes, len);
+    }
+
+    Symbol::~Symbol() {
+        delete bytes;
     }
 
     bool Symbol::equals(const Symbol *rhs) const {

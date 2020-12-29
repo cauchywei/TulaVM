@@ -44,4 +44,4 @@ target_include_directories(example PRIVATE ../src)
 target_link_libraries(example Tula gtest_main)
 add_test(NAME example_test COMMAND example)
 
-file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

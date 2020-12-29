@@ -8,14 +8,12 @@ namespace ccw::tula {
         std::atomic_intptr_t ptr;
     };
 
-
     ConstantPool::ConstantPool(uint16_t size) : size(size) {
         tags = new std::atomic<ConstantType>[size];
         entities = new intptr_t[size];
     }
 
     ConstantPool::~ConstantPool() {
-        // TODO clear entities
         delete[] entities;
         delete[] tags;
     }

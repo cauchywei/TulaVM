@@ -3,7 +3,7 @@
 #include "../Types.hpp"
 #include "../Error.hpp"
 
-#include <ccw/base.hpp>
+#include <ccw/Base.hpp>
 
 namespace ccw::tula {
     class ClassFileReader : public Noncopyable {

@@ -10,11 +10,11 @@ namespace ccw::tula {
         uint16_t index = 1;
 
         const char *className = "test/java/Hello";
-        auto symbol = Symbol::create((uint8_t *) className, strlen(className));
+        auto symbol = Symbol::create(className);
         cp.putSymbolAt(index, symbol);
         const Symbol::Ptr &getSymbol = cp.getSymbolAt(index);
         ASSERT_EQ(ConstantType::Utf8, cp.getConstantTypeAt(index));
-        ASSERT_TRUE(getSymbol->equals((uint8_t *) className, strlen(className)));
+        ASSERT_TRUE(getSymbol->equals(className));
     }
 
 

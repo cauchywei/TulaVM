@@ -16,7 +16,7 @@ namespace ccw::tula {
     void VM::start() {
         auto initializeClazz = bootstrapClazzLoader->defineClass(initializeClazzPath);
         if(initializeClazz == nullptr) {
-            fprintf(stderr, "Class not found. %s", initializeClazzPath.c_str());
+            fprintf(stderr, "Class not found at %s", initializeClazzPath.c_str());
             exit(-1);
         }
     }

@@ -9,12 +9,16 @@ namespace ccw::tula {
         using Hash = uint32_t;
         using Ptr = std::shared_ptr<Symbol>;
 
-        Symbol(uint8_t *bytes, uint32_t len);
+        Symbol(const uint8_t *bytes, size_t len);
 
         virtual ~Symbol();
 
-        static inline Symbol::Ptr create(uint8_t *bytes, int len) {
+        static inline Symbol::Ptr create(const uint8_t *bytes, size_t len) {
             return std::make_shared<Symbol>(bytes, len);
+        }
+
+        static inline Symbol::Ptr create(const char *cstr) {
+            return std::make_shared<Symbol>(reinterpret_cast<const uint8_t *>(cstr), strlen(cstr));
         }
 
         bool equals(const Symbol *rhs) const;
@@ -44,7 +48,7 @@ namespace ccw::tula {
 
     private:
         uint8_t *bytes;
-        uint32_t len;
+        size_t len;
         Hash hashValue;
     };
 

@@ -74,7 +74,7 @@ namespace ccw::tula {
     }
 
     ClassFileParser::ClassFileParser(const u8 *data, uint32_t len) :
-            reader(data, len), cp(nullptr) {
+        reader(data, len), cp(nullptr) {
     }
 
     void ClassFileParser::throwParseException(const char *fmt, ...) {
@@ -130,16 +130,15 @@ namespace ccw::tula {
         reader.ensure(8);
         accessFlags = static_cast<ClassAccessFlags >(reader.readU16Unchecked());
         if (accessFlags & ClassAccessFlags::Interface) {
-            throwValidExceptionAssert(accessFlags & ClassAccessFlags::Abstract,
-                                      "Interface must be abstract.");
-            throwValidExceptionAssert(!(accessFlags & ClassAccessFlags::Final),
-                                      "Interface must be non-final.");
+            throwValidExceptionAssert(accessFlags & ClassAccessFlags::Abstract, "Interface must be abstract.");
+            throwValidExceptionAssert(!(accessFlags & ClassAccessFlags::Final), "Interface must be non-final.");
+            throwValidExceptionAssert(!(accessFlags & ClassAccessFlags::Super), "Interface must be non-super.");
+            throwValidExceptionAssert(!(accessFlags & ClassAccessFlags::Enum), "Interface must be non-enum.");
         } else {
-            throwValidExceptionAssert(accessFlags & ClassAccessFlags::Annotation, "Class is not annotation");
+            throwValidExceptionAssert(!(accessFlags & ClassAccessFlags::Annotation), "Class is not annotation");
             throwValidExceptionAssert(
-                    !(accessFlags & ClassAccessFlags::Final && accessFlags & ClassAccessFlags::Abstract),
-                    "Final Class can not be abstract.");
-
+                !(accessFlags & ClassAccessFlags::Final && accessFlags & ClassAccessFlags::Abstract),
+                "Final Class can not be abstract.");
         }
 
         if (accessFlags & ClassAccessFlags::Annotation) {
@@ -152,15 +151,14 @@ namespace ccw::tula {
         auto thisClassName = cp->getClassAt(thisClassIndex);
         auto superClassIndex = reader.readU16Unchecked();
         throwValidExceptionAssert(superClassIndex == 0 || isValidCpIndex(superClassIndex) &&
-                                                                  cp->getTagAt(
-                                                                          superClassIndex).isClassOrUnresolvedClass(),
+                                                          cp->getTagAt(
+                                                              superClassIndex).isClassOrUnresolvedClass(),
                                   "Invalid super class index at %d", superClassIndex);
 
         // TODO resolved super class
         auto interfacesCount = reader.readU16Unchecked();
         reader.ensure(2 * interfacesCount);
         auto interfaces = parseInterfaces(interfacesCount);
-
 
         return nullptr;
     }
@@ -173,24 +171,24 @@ namespace ccw::tula {
             auto fieldAccessFlags = static_cast<FieldAccessFlags>(reader.readU16Unchecked());
             if (fieldAccessFlags & FieldAccessFlags::Public) {
                 throwValidExceptionAssert(
-                        fieldAccessFlags & FieldAccessFlags::Protected || fieldAccessFlags & FieldAccessFlags::Private,
-                        "invalid field access flags %d", fieldAccessFlags);
+                    fieldAccessFlags & FieldAccessFlags::Protected || fieldAccessFlags & FieldAccessFlags::Private,
+                    "invalid field access flags %d", fieldAccessFlags);
             } else if (fieldAccessFlags & FieldAccessFlags::Private) {
                 throwValidExceptionAssert(
-                        fieldAccessFlags & FieldAccessFlags::Protected || fieldAccessFlags & FieldAccessFlags::Public,
-                        "invalid field access flags %d", fieldAccessFlags);
+                    fieldAccessFlags & FieldAccessFlags::Protected || fieldAccessFlags & FieldAccessFlags::Public,
+                    "invalid field access flags %d", fieldAccessFlags);
             } else if (fieldAccessFlags & FieldAccessFlags::Protected) {
                 throwValidExceptionAssert(
-                        fieldAccessFlags & FieldAccessFlags::Private || fieldAccessFlags & FieldAccessFlags::Public,
-                        "invalid field access flags %d", fieldAccessFlags);
+                    fieldAccessFlags & FieldAccessFlags::Private || fieldAccessFlags & FieldAccessFlags::Public,
+                    "invalid field access flags %d", fieldAccessFlags);
             }
 
             if (isInterface) {
                 throwValidExceptionAssert(
-                        (fieldAccessFlags & FieldAccessFlags::Public)
-                        && (fieldAccessFlags & FieldAccessFlags::Final)
-                        && (fieldAccessFlags & FieldAccessFlags::Static),
-                        "invalid field access flags %d in interface", fieldAccessFlags);
+                    (fieldAccessFlags & FieldAccessFlags::Public)
+                    && (fieldAccessFlags & FieldAccessFlags::Final)
+                    && (fieldAccessFlags & FieldAccessFlags::Static),
+                    "invalid field access flags %d in interface", fieldAccessFlags);
             }
 
             auto nameIndex = reader.readU16Unchecked();
@@ -229,12 +227,12 @@ namespace ccw::tula {
 
             const Symbol::Ptr &attrName = cp->getSymbolAt(attrNameIndex);
             if (attrName->equals(ATTRIBUTE_ConstantValue)) {
-                if(flags & FieldAccessFlags::Static) {
+                if (flags & FieldAccessFlags::Static) {
                     throwValidExceptionAssert(len == 2, "Invalid constant value attr length %d", len);
                     auto cvIndex = reader.readU16Unchecked();
                     throwValidExceptionAssert(
-                            isValidCpIndex(cvIndex)
-                            && cp->getTagAt(cvIndex).isConstantValueType(), "Invalid constant value index %d", cvIndex);
+                        isValidCpIndex(cvIndex)
+                        && cp->getTagAt(cvIndex).isConstantValueType(), "Invalid constant value index %d", cvIndex);
                     constValueIndex = cvIndex;
                 } else {
                     reader.skip(len);
@@ -272,7 +270,7 @@ namespace ccw::tula {
                                 int32_t value = cp->getIntegerAt(cIndex);
                                 break;
                             }
-                            case ElementValueTag::Char:{
+                            case ElementValueTag::Char: {
                                 auto cIndex = reader.readU16();
                                 throwValidExceptionAssert(isValidCpIndex(cIndex)
                                                           && cp->getTagAt(cIndex).isInteger(),
@@ -280,7 +278,7 @@ namespace ccw::tula {
                                 auto value = cp->getIntegerAt(cIndex);
                                 break;
                             }
-                            case ElementValueTag::Double:{
+                            case ElementValueTag::Double: {
                                 auto cIndex = reader.readU16();
                                 throwValidExceptionAssert(isValidCpIndex(cIndex)
                                                           && cp->getTagAt(cIndex).isDouble(),
@@ -288,7 +286,7 @@ namespace ccw::tula {
                                 auto value = cp->getDoubleAt(cIndex);
                                 break;
                             }
-                            case ElementValueTag::Float:{
+                            case ElementValueTag::Float: {
                                 auto cIndex = reader.readU16();
                                 throwValidExceptionAssert(isValidCpIndex(cIndex)
                                                           && cp->getTagAt(cIndex).isFloat(),
@@ -296,7 +294,7 @@ namespace ccw::tula {
                                 auto value = cp->getFloatAt(cIndex);
                                 break;
                             }
-                            case ElementValueTag::Int:{
+                            case ElementValueTag::Int: {
                                 auto cIndex = reader.readU16();
                                 throwValidExceptionAssert(isValidCpIndex(cIndex)
                                                           && cp->getTagAt(cIndex).isInteger(),
@@ -304,7 +302,7 @@ namespace ccw::tula {
                                 auto value = cp->getIntegerAt(cIndex);
                                 break;
                             }
-                            case ElementValueTag::Long:{
+                            case ElementValueTag::Long: {
                                 auto cIndex = reader.readU16();
                                 throwValidExceptionAssert(isValidCpIndex(cIndex)
                                                           && cp->getTagAt(cIndex).isLong(),
@@ -313,13 +311,13 @@ namespace ccw::tula {
                                 break;
                             }
                             case ElementValueTag::Short: {
-                                        auto cIndex = reader.readU16();
-                                        throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                                  && cp->getTagAt(cIndex).isInteger(),
-                                                                  "Invalid const value index at %d", cIndex);
-                                        auto value = cp->getIntegerAt(cIndex);
-                                        break;
-                                }
+                                auto cIndex = reader.readU16();
+                                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                                          && cp->getTagAt(cIndex).isInteger(),
+                                                          "Invalid const value index at %d", cIndex);
+                                auto value = cp->getIntegerAt(cIndex);
+                                break;
+                            }
                             case ElementValueTag::Boolean: {
                                 auto cIndex = reader.readU16();
                                 throwValidExceptionAssert(isValidCpIndex(cIndex)
@@ -336,10 +334,14 @@ namespace ccw::tula {
                                 auto value = cp->getSymbolAt(cIndex);
                                 break;
                             }
-                            case ElementValueTag::EnumType:break;
-                            case ElementValueTag::Class:break;
-                            case ElementValueTag::AnnotationType:break;
-                            case ElementValueTag::ArrayType:break;
+                            case ElementValueTag::EnumType:
+                                break;
+                            case ElementValueTag::Class:
+                                break;
+                            case ElementValueTag::AnnotationType:
+                                break;
+                            case ElementValueTag::ArrayType:
+                                break;
                             default:
                                 throwParseException("Invalid element tag value");
                         }
@@ -358,12 +360,12 @@ namespace ccw::tula {
         }
     }
 
-    const Symbol::Ptr & ClassFileParser::parseSignatureAttribute(u32 len) {
+    const Symbol::Ptr &ClassFileParser::parseSignatureAttribute(u32 len) {
         throwValidExceptionAssert(len == 2, "Invalid signature attr length %d", len);
         auto sigIndex = reader.readU16Unchecked();
         throwValidExceptionAssert(
-                isValidCpIndex(sigIndex)
-                && cp->getTagAt(sigIndex).isUtf8(), "Invalid signature index %d", sigIndex);
+            isValidCpIndex(sigIndex)
+            && cp->getTagAt(sigIndex).isUtf8(), "Invalid signature index %d", sigIndex);
         return cp->getSymbolAt(sigIndex);
     }
 
@@ -413,27 +415,27 @@ namespace ccw::tula {
                 case ConstantType::InterfaceMethodref: {
                     uint16_t classIndex = cp->getRefClassIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(classIndex) && cp->getTagAt(classIndex).isClassOrIndex(),
-                            "Invalid class index at %d", classIndex);
+                        isValidCpIndex(classIndex) && cp->getTagAt(classIndex).isClassOrIndex(),
+                        "Invalid class index at %d", classIndex);
                     uint16_t nameAndTypeIndex = cp->getRefNameAndTypeIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(nameAndTypeIndex) &&
-                            cp->getTagAt(nameAndTypeIndex) == ConstantType::NameAndType,
-                            "Invalid name and type index at %d", nameAndTypeIndex);
+                        isValidCpIndex(nameAndTypeIndex) &&
+                        cp->getTagAt(nameAndTypeIndex) == ConstantType::NameAndType,
+                        "Invalid name and type index at %d", nameAndTypeIndex);
                     break;
                 }
                 case ConstantType::NameAndType: {
                     uint16_t nameIndex = cp->getNameAndTypeNameIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(nameIndex) && cp->getTagAt(nameIndex) == ConstantType::Utf8,
-                            "Invalid name index at %d",
-                            nameIndex);
+                        isValidCpIndex(nameIndex) && cp->getTagAt(nameIndex) == ConstantType::Utf8,
+                        "Invalid name index at %d",
+                        nameIndex);
 
                     uint16_t descriptorIndex = cp->getNameAndTypeDescriptorIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(descriptorIndex) && cp->getTagAt(descriptorIndex) == ConstantType::Utf8,
-                            "Invalid descriptor index at %d",
-                            descriptorIndex);
+                        isValidCpIndex(descriptorIndex) && cp->getTagAt(descriptorIndex) == ConstantType::Utf8,
+                        "Invalid descriptor index at %d",
+                        descriptorIndex);
                 }
                     break;
                 case ConstantType::MethodHandle: {
@@ -460,10 +462,10 @@ namespace ccw::tula {
                         case ReferenceKind::REF_invokeSpecial: {
                             ConstantTag refTag = cp->getTagAt(referenceIndex);
                             throwValidExceptionAssert(
-                                    majorVersion < JAVA_8_VERSION && refTag == ConstantType::Methodref ||
-                                    majorVersion >= JAVA_8_VERSION &&
-                                    (refTag == ConstantType::Methodref || refTag == ConstantType::InterfaceMethodref),
-                                    "Invalid method reference index %d", kindValue);
+                                majorVersion < JAVA_8_VERSION && refTag == ConstantType::Methodref ||
+                                majorVersion >= JAVA_8_VERSION &&
+                                (refTag == ConstantType::Methodref || refTag == ConstantType::InterfaceMethodref),
+                                "Invalid method reference index %d", kindValue);
                             break;
                         }
                         case ReferenceKind::REF_invokeInterface:
@@ -477,24 +479,24 @@ namespace ccw::tula {
                 case ConstantType::MethodType: {
                     uint16_t descriptorIndex = cp->getMethodTypeDescriptorIndex(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(descriptorIndex) && cp->getTagAt(descriptorIndex) == ConstantType::Utf8,
-                            "Invalid descriptor index at %d",
-                            descriptorIndex);
+                        isValidCpIndex(descriptorIndex) && cp->getTagAt(descriptorIndex) == ConstantType::Utf8,
+                        "Invalid descriptor index at %d",
+                        descriptorIndex);
                     break;
                 }
                 case ConstantType::InvokeDynamic: {
                     uint16_t nameAndTypeIndex = cp->getInvokeDynamicNameAndTypeIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(nameAndTypeIndex) &&
-                            cp->getTagAt(nameAndTypeIndex) == ConstantType::NameAndType,
-                            "Invalid name and type index at %d", nameAndTypeIndex);
+                        isValidCpIndex(nameAndTypeIndex) &&
+                        cp->getTagAt(nameAndTypeIndex) == ConstantType::NameAndType,
+                        "Invalid name and type index at %d", nameAndTypeIndex);
                     break;
                 }
                 case ConstantType::ClassIndex: {
                     uint16_t nameIndex = cp->getClassIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(nameIndex) && cp->getTagAt(nameIndex) == ConstantType::Utf8,
-                            "Invalid class name index at %d", nameIndex);
+                        isValidCpIndex(nameIndex) && cp->getTagAt(nameIndex) == ConstantType::Utf8,
+                        "Invalid class name index at %d", nameIndex);
                     const Symbol::Ptr &className = cp->getSymbolAt(nameIndex);
                     cp->putUnresolvedClassAt(i, className);
                     break;
@@ -502,8 +504,8 @@ namespace ccw::tula {
                 case ConstantType::StringIndex: {
                     uint16_t stringIndex = cp->getStringIndexAt(i);
                     throwValidExceptionAssert(
-                            isValidCpIndex(stringIndex) && cp->getTagAt(stringIndex) == ConstantType::Utf8,
-                            "Invalid string index at %d", stringIndex);
+                        isValidCpIndex(stringIndex) && cp->getTagAt(stringIndex) == ConstantType::Utf8,
+                        "Invalid string index at %d", stringIndex);
                     const Symbol::Ptr &symbol = cp->getSymbolAt(stringIndex);
                     cp->putStringAt(i, symbol);
                     break;

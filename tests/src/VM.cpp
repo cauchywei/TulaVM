@@ -7,7 +7,7 @@ using namespace ccw::tula;
 TEST(TestVM, TestSimpleClass) {
     ASSERT_TRUE(VM::current() == nullptr);
     {
-        unique_ptr<VM> pVm = make_unique<VM>("", "data/test/tula/Test.class");
+        unique_ptr<VM> pVm = make_unique<VM>("", "res/com/tula/Test.class");
         ASSERT_TRUE(VM::current() == pVm.get());
         pVm->start();
     }
