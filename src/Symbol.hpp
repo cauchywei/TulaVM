@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ccw/Base.hpp>
+#include <CCW/Base.hpp>
 #include <memory>
 
-namespace ccw::tula {
+namespace CCW::Tula {
     class Symbol : public Noncopyable, public std::enable_shared_from_this<Symbol> {
     public:
         using Hash = uint32_t;

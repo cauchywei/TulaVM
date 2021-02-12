@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     class ClassFileParser {
     public:

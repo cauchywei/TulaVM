@@ -1,5 +1,5 @@
 #include "Klass.hpp"
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
 }

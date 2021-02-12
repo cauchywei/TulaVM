@@ -7,55 +7,55 @@
 #include <utility>
 #include <variant>
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     struct ConstantTag {
         ConstantType type;
 
-        inline bool isReference() const {
+        [[nodiscard]] inline bool isReference() const {
             return type == ConstantType::Fieldref
                    || type == ConstantType::Methodref
                    || type == ConstantType::InterfaceMethodref;
         }
 
-        inline bool isClassOrIndex() const {
+        [[nodiscard]] inline bool isClassOrIndex() const {
             return isClassOrUnresolvedClass() || type == ConstantType::ClassIndex;
         }
 
-        inline bool isClass() const {
+        [[nodiscard]] inline bool isClass() const {
             return type == ConstantType::Class;
         }
 
-        inline bool isUnresolvedClass() const {
+        [[nodiscard]] inline bool isUnresolvedClass() const {
             return type == ConstantType::UnresolvedClass;
         }
 
-        inline bool isClassOrUnresolvedClass() const {
+        [[nodiscard]] inline bool isClassOrUnresolvedClass() const {
             return type == ConstantType::Class
                    || type == ConstantType::UnresolvedClass;
         }
 
-        inline bool isUtf8() const {
+        [[nodiscard]] inline bool isUtf8() const {
             return type == ConstantType::Utf8;
         }
 
-        inline bool isInteger() const {
+        [[nodiscard]] inline bool isInteger() const {
             return type == ConstantType ::Integer;
         }
 
-        inline bool isLong() const {
+        [[nodiscard]] inline bool isLong() const {
             return type == ConstantType ::Long;
         }
 
-        inline bool isDouble() const {
+        [[nodiscard]] inline bool isDouble() const {
             return type == ConstantType ::Double;
         }
 
-        inline bool isFloat() const {
+        [[nodiscard]] inline bool isFloat() const {
             return type == ConstantType ::Float;
         }
 
-        inline bool isConstantValueType() const {
+        [[nodiscard]] inline bool isConstantValueType() const {
             return type == ConstantType::Long
                    || type == ConstantType::Float
                    || type == ConstantType::Double
@@ -99,11 +99,11 @@ namespace ccw::tula {
     public:
         explicit ConstantPool(uint16_t size);
 
-        inline bool isValidIndex(uint16_t index) const {
+        [[nodiscard]] inline bool isValidIndex(uint16_t index) const {
             return index > 0 && index <= size;
         }
 
-        uint16_t getSize() const {
+        [[nodiscard]] uint16_t getSize() const {
             return size;
         }
 

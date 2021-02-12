@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "utils/Enum.hpp"
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     typedef unsigned char jboolean;
     typedef unsigned short jchar;
@@ -93,5 +93,5 @@ namespace ccw::tula {
     };
 }
 
-ENABLE_BITMASK_OPERATORS(ccw::tula::ClassAccessFlags);
-ENABLE_BITMASK_OPERATORS(ccw::tula::FieldAccessFlags);
+ENABLE_BITMASK_OPERATORS(CCW::Tula::ClassAccessFlags);
+ENABLE_BITMASK_OPERATORS(CCW::Tula::FieldAccessFlags);

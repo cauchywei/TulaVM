@@ -44,7 +44,7 @@
 #define ATTRIBUTE_RuntimeVisibleTypeAnnotations "RuntimeVisibleTypeAnnotations"
 #define ATTRIBUTE_RuntimeInvisibleTypeAnnotations "RuntimeInvisibleTypeAnnotations"
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     std::string printf(const char *fmt, ...) {
         va_list args;
@@ -68,7 +68,7 @@ namespace ccw::tula {
     }
 
 
-    Klass::Ptr ClassFileParser::parse(const tula::u8 *data, uint32_t len) noexcept(false) {
+    Klass::Ptr ClassFileParser::parse(const Tula::u8 *data, uint32_t len) noexcept(false) {
         ClassFileParser parser(data, len);
         return parser.parse();
     }
@@ -160,6 +160,8 @@ namespace ccw::tula {
         reader.ensure(2 * interfacesCount);
         auto interfaces = parseInterfaces(interfacesCount);
 
+        auto fieldsCount = reader.readU16Unchecked();
+
         return nullptr;
     }
 
@@ -203,7 +205,6 @@ namespace ccw::tula {
                                       "Invalid field descriptor index at %d", descriptorIndex);
 
             parseFieldAttributes(fieldAccessFlags);
-
 
         }
     }
@@ -395,11 +396,8 @@ namespace ccw::tula {
             ConstantType tag = cp->getTagAt(i).type;
             switch (tag) {
                 case ConstantType::Utf8:
-                    break;
                 case ConstantType::Unicode:
-                    break;
                 case ConstantType::Integer:
-                    break;
                 case ConstantType::Float:
                     break;
                 case ConstantType::Long:
@@ -439,9 +437,9 @@ namespace ccw::tula {
                 }
                     break;
                 case ConstantType::MethodHandle: {
-                    uint8_t kindValue = cp->getMethodHandleReferenceKindAt(i);
+                    auto kindValue = cp->getMethodHandleReferenceKindAt(i);
                     throwValidExceptionAssert(kindValue >= 1 && kindValue <= 9, "Invalid reference kind %d", kindValue);
-                    uint16_t referenceIndex = cp->getMethodHandleReferenceIndexAt(i);
+                    auto referenceIndex = cp->getMethodHandleReferenceIndexAt(i);
                     throwValidExceptionAssert(isValidCpIndex(referenceIndex), "Invalid reference index %d",
                                               referenceIndex);
                     auto kind = static_cast<ReferenceKind >(kindValue);

@@ -1,6 +1,6 @@
 #include "Symbol.hpp"
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     Symbol::Symbol(const uint8_t *bytes, size_t len) : len(len) {
         this->bytes = static_cast<uint8_t *>(malloc(len + 1));

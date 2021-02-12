@@ -5,7 +5,7 @@
 #include <fstream>
 #include <utility>
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     BootstrapClassLoader::BootstrapClassLoader(VM *vm, std::string libPath) : vm(vm), libPath(std::move(libPath)) {}
 
@@ -24,11 +24,11 @@ namespace ccw::tula {
     }
 
     Klass::Ptr BootstrapClassLoader::loadClass(const Symbol::Ptr &clazz) {
-        return tula::Klass::Ptr();
+        return Tula::Klass::Ptr();
     }
 
     Klass::Ptr BootstrapClassLoader::findClass(const Symbol::Ptr &clazz) {
-        return tula::Klass::Ptr();
+        return Tula::Klass::Ptr();
     }
 
     Klass::Ptr BootstrapClassLoader::findLoadedKlass(const Symbol::Ptr &clazz) {

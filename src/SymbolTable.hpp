@@ -6,7 +6,7 @@
 #include <vector>
 #include <optional>
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     using SymbolHash =  int32_t;
 

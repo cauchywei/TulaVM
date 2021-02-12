@@ -3,9 +3,9 @@
 #include "../Types.hpp"
 #include "../Error.hpp"
 
-#include <ccw/Base.hpp>
+#include <CCW/Base.hpp>
 
-namespace ccw::tula {
+namespace CCW::Tula {
     class ClassFileReader : public Noncopyable {
     public:
 

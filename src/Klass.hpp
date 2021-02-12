@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace ccw::tula {
+namespace CCW::Tula {
     class Klass : public Interface {
     public:
         using Ptr = std::shared_ptr<Klass>;

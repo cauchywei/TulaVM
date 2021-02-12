@@ -2,7 +2,7 @@
 #include "ClazzLoader.hpp"
 #include "SymbolTable.hpp"
 
-namespace ccw::tula {
+namespace CCW::Tula {
     // TODO add lock
     static VM *gVM = nullptr;
 

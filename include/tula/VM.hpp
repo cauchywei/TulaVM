@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ccw/Base.hpp>
+#include <CCW/Base.hpp>
 #include <string>
 
-namespace ccw::tula {
+namespace CCW::Tula {
     class BootstrapClassLoader;
 
     class VM : public Noncopyable {

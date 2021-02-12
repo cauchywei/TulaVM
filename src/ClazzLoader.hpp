@@ -8,7 +8,7 @@
 #include <shared_mutex>
 #include <vector>
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     class VM;
 

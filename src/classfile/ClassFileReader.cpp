@@ -1,6 +1,6 @@
 #include "ClassFileReader.hpp"
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     u8 ClassFileReader::readU8() {
         ensure(1, "buffer overflow");

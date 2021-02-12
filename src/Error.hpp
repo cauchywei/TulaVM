@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-namespace ccw::tula {
+namespace CCW::Tula {
     class Error : public std::exception {
     public:
         Error() : message() {}

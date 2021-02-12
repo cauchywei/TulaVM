@@ -2,7 +2,7 @@
 #include <tula/VM.hpp>
 
 using namespace std;
-using namespace ccw::tula;
+using namespace CCW::Tula;
 
 TEST(TestVM, TestSimpleClass) {
     ASSERT_TRUE(VM::current() == nullptr);

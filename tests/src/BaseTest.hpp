@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-namespace ccw::tula {
+namespace CCW::Tula {
     class BaseTest : public ::testing::Test {
     protected:
 

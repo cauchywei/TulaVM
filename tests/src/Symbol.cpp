@@ -3,7 +3,7 @@
 
 #include "Symbol.hpp"
 
-using namespace ccw::tula;
+using namespace CCW::Tula;
 
 TEST(Symbol, TestSymbolEquals) {
     const char *a_bytes = "abcde";

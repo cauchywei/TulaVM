@@ -2,7 +2,7 @@
 #include <JVM.hpp>
 #include <ConstantPool.hpp>
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     TEST(TestConstantPool, TestUtf8) {
         ConstantPool cp(10);

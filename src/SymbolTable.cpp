@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     static mutex gSymbolTableLock;
     static SymbolTable* gSymbolTable;

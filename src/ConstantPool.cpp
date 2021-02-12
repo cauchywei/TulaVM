@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-namespace ccw::tula {
+namespace CCW::Tula {
 
     struct ClassEntityInternal : public Noncopyable {
         std::atomic_intptr_t ptr;
