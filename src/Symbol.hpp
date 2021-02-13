@@ -4,26 +4,26 @@
 #include <memory>
 
 namespace CCW::Tula {
+
     class Symbol : public Noncopyable, public std::enable_shared_from_this<Symbol> {
     public:
         using Hash = uint32_t;
-        using Ptr = std::shared_ptr<Symbol>;
 
         Symbol(const uint8_t *bytes, size_t len);
 
         virtual ~Symbol();
 
-        static inline Symbol::Ptr create(const uint8_t *bytes, size_t len) {
+        static inline std::shared_ptr<Symbol> create(const uint8_t *bytes, size_t len) {
             return std::make_shared<Symbol>(bytes, len);
         }
 
-        static inline Symbol::Ptr create(const char *cstr) {
+        static inline std::shared_ptr<Symbol> create(const char *cstr) {
             return std::make_shared<Symbol>(reinterpret_cast<const uint8_t *>(cstr), strlen(cstr));
         }
 
         bool equals(const Symbol *rhs) const;
 
-        bool equals(const Symbol::Ptr &rhs) const {
+        bool equals(const std::shared_ptr<Symbol> &rhs) const {
             return equals(rhs.get());
         }
 
@@ -52,4 +52,5 @@ namespace CCW::Tula {
         Hash hashValue;
     };
 
+    using SymbolPtr = std::shared_ptr<Symbol>;
 }

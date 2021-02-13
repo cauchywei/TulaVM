@@ -5,43 +5,52 @@
 #include "../Klass.hpp"
 #include "../ConstantPool.hpp"
 
-using namespace std;
+#include <vector>
 
 namespace CCW::Tula {
 
     class ClassFileParser {
     public:
-        static Klass::Ptr parse(const u8 *data, uint32_t len) noexcept(false);
+        static Klass::Ptr parse(const uint8_t *data, uint32_t len) noexcept(false);
 
-        ClassFileParser(const u8 *data, uint32_t len);
+        ClassFileParser(const uint8_t *data, uint32_t len);
 
         Klass::Ptr parse() noexcept(false);
 
-
-    private:
-        ClassFileReader reader;
-        shared_ptr<ConstantPool> cp;
-
-        u16 minorVersion{};
-        u16 majorVersion{};
-        ClassAccessFlags accessFlags;
     private:
         static void throwParseException(const char *fmt, ...);
 
-        shared_ptr<ConstantPool> parseConstantPool();
+        void parseConstantPool() noexcept(false);
 
-        void parseConstantPoolEntities();
+        void parseConstantPoolEntities() noexcept(false);
 
-        vector<uint16_t> parseInterfaces(uint16_t size);
+        void parseInterfaces() noexcept(false);
 
+        void parseFields() noexcept(false);
 
+        void parseAnnotations() noexcept(false);
+
+        void parseAnnotation() noexcept(false);
+
+        void parseTypeAnnotations() noexcept(false);
+
+        void parseElementValue() noexcept(false);
 
         bool isValidCpIndex(uint16_t index);
 
-        void parseFields();
-
         void parseFieldAttributes(FieldAccessFlags flags);
 
-        const Symbol::Ptr & parseSignatureAttribute(u32 len);
+        const SymbolPtr& parseSignatureAttribute(uint32_t len);
+
+    private:
+        ClassFileReader reader;
+        std::shared_ptr<ConstantPool> cp;
+
+        uint16_t minorVersion{};
+        uint16_t majorVersion{};
+        ClassAccessFlags accessFlags {};
+
+        std::vector<uint16_t> interfaces {};
+        std::vector<uint16_t> fields {};
     };
 }

@@ -10,7 +10,7 @@ namespace CCW::Tula {
 
     using SymbolHash =  int32_t;
 
-    using SymbolList =  std::vector<Symbol::Ptr>;
+    using SymbolList =  std::vector<SymbolPtr>;
 
     using SymbolListPtr =  std::shared_ptr<SymbolList>;
 
@@ -22,9 +22,9 @@ namespace CCW::Tula {
 
         using BucketPtr = std::shared_ptr<Bucket>;
 
-        static bool putSymbol(const Symbol::Ptr &symbol);
+        static bool putSymbol(const SymbolPtr &symbol);
 
-        static bool contains(const Symbol::Ptr &symbol);
+        static bool contains(const SymbolPtr &symbol);
 
         static std::optional<BucketPtr> findBucketByHash(Symbol::Hash hash);
 

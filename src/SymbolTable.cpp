@@ -11,12 +11,12 @@ namespace CCW::Tula {
 
     class SymbolTable::Bucket : public Noncopyable {
     public:
-        void push(const Symbol::Ptr &symbol) {
+        void push(const SymbolPtr &symbol) {
             lock_guard<mutex> _(lock);
             symbols.push_back(symbol);
         }
 
-        bool contains(const Symbol::Ptr &symbol) {
+        bool contains(const SymbolPtr &symbol) {
             lock_guard<mutex> _(lock);
             return find_if(symbols.begin(), symbols.end(), [&symbol](const auto &sym) {
                 return sym->equals(symbol);
@@ -25,7 +25,7 @@ namespace CCW::Tula {
 
     private:
         mutex lock;
-        vector<Symbol::Ptr> symbols;
+        vector<SymbolPtr> symbols;
     };
 
     void SymbolTable::init() {
@@ -36,7 +36,7 @@ namespace CCW::Tula {
         delete gSymbolTable;
     }
 
-    bool SymbolTable::putSymbol(const Symbol::Ptr &symbol) {
+    bool SymbolTable::putSymbol(const SymbolPtr &symbol) {
         if (contains(symbol)) {
             return false;
         }
@@ -53,7 +53,7 @@ namespace CCW::Tula {
         return true;
     }
 
-    bool SymbolTable::contains(const Symbol::Ptr &symbol) {
+    bool SymbolTable::contains(const SymbolPtr &symbol) {
         if (auto foundBucket = findBucketByHash(symbol->hash())) {
             auto bucket = *foundBucket;
             return bucket->contains(symbol);

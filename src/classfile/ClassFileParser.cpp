@@ -21,30 +21,32 @@
 // Extension method support.
 #define JAVA_8_VERSION                    52
 
-#define ATTRIBUTE_SourceFile "SourceFile"
-#define ATTRIBUTE_InnerClasses "InnerClasses"
-#define ATTRIBUTE_EnclosingMethod "EnclosingMethod"
-#define ATTRIBUTE_SourceDebugExtension "SourceDebugExtension"
-#define ATTRIBUTE_BootstrapMethods "BootstrapMethods"
-#define ATTRIBUTE_ConstantValue "ConstantValue"
-#define ATTRIBUTE_Code "Code"
-#define ATTRIBUTE_Exceptions "Exceptions"
-#define ATTRIBUTE_RuntimeVisibleParameterAnnotations "RuntimeVisibleParameterAnnotations"
-#define ATTRIBUTE_AnnotationDefault "AnnotationDefault"
-#define ATTRIBUTE_MethodParameters "MethodParameters"
-#define ATTRIBUTE_Synthetic "Synthetic"
-#define ATTRIBUTE_Deprecated "Deprecated"
-#define ATTRIBUTE_Signature "Signature"
-#define ATTRIBUTE_RuntimeVisibleAnnotations "RuntimeVisibleAnnotations"
-#define ATTRIBUTE_RuntimeInisibleAnnotations "RuntimeInisibleAnnotations"
-#define ATTRIBUTE_LineNumberTable "LineNumberTable"
-#define ATTRIBUTE_LocalVariableTable "LocalVariableTable"
-#define ATTRIBUTE_LocalVariableTypeTable "LocalVariableTypeTable"
-#define ATTRIBUTE_StackMapTable "StackMapTable"
-#define ATTRIBUTE_RuntimeVisibleTypeAnnotations "RuntimeVisibleTypeAnnotations"
-#define ATTRIBUTE_RuntimeInvisibleTypeAnnotations "RuntimeInvisibleTypeAnnotations"
 
 namespace CCW::Tula {
+
+    static constexpr const char *ATTRIBUTE_SourceFile = "SourceFile";
+    static constexpr const char *ATTRIBUTE_InnerClasses = "InnerClasses";
+    static constexpr const char *ATTRIBUTE_EnclosingMethod = "EnclosingMethod";
+    static constexpr const char *ATTRIBUTE_SourceDebugExtension = "SourceDebugExtension";
+    static constexpr const char *ATTRIBUTE_BootstrapMethods = "BootstrapMethods";
+    static constexpr const char *ATTRIBUTE_ConstantValue = "ConstantValue";
+    static constexpr const char *ATTRIBUTE_Code = "Code";
+    static constexpr const char *ATTRIBUTE_Exceptions = "Exceptions";
+    static constexpr const char *ATTRIBUTE_RuntimeVisibleParameterAnnotations = "RuntimeVisibleParameterAnnotations";
+    static constexpr const char *ATTRIBUTE_AnnotationDefault = "AnnotationDefault";
+    static constexpr const char *ATTRIBUTE_MethodParameters = "MethodParameters";
+    static constexpr const char *ATTRIBUTE_Synthetic = "Synthetic";
+    static constexpr const char *ATTRIBUTE_Deprecated = "Deprecated";
+    static constexpr const char *ATTRIBUTE_Signature = "Signature";
+    static constexpr const char *ATTRIBUTE_RuntimeVisibleAnnotations = "RuntimeVisibleAnnotations";
+    static constexpr const char *ATTRIBUTE_RuntimeInvisibleAnnotations = "RuntimeInvisibleAnnotations";
+    static constexpr const char *ATTRIBUTE_LineNumberTable = "LineNumberTable";
+    static constexpr const char *ATTRIBUTE_LocalVariableTable = "LocalVariableTable";
+    static constexpr const char *ATTRIBUTE_LocalVariableTypeTable = "LocalVariableTypeTable";
+    static constexpr const char *ATTRIBUTE_StackMapTable = "StackMapTable";
+    static constexpr const char *ATTRIBUTE_RuntimeVisibleTypeAnnotations = "RuntimeVisibleTypeAnnotations";
+    static constexpr const char *ATTRIBUTE_RuntimeInvisibleTypeAnnotations = "RuntimeInvisibleTypeAnnotations";
+
 
     std::string printf(const char *fmt, ...) {
         va_list args;
@@ -68,12 +70,12 @@ namespace CCW::Tula {
     }
 
 
-    Klass::Ptr ClassFileParser::parse(const Tula::u8 *data, uint32_t len) noexcept(false) {
+    Klass::Ptr ClassFileParser::parse(const uint8_t *data, uint32_t len) noexcept(false) {
         ClassFileParser parser(data, len);
         return parser.parse();
     }
 
-    ClassFileParser::ClassFileParser(const u8 *data, uint32_t len) :
+    ClassFileParser::ClassFileParser(const uint8_t *data, uint32_t len) :
         reader(data, len), cp(nullptr) {
     }
 
@@ -103,7 +105,7 @@ namespace CCW::Tula {
         return index > 0 && index < cp->getSize();
     }
 
-    bool isValidDescriptor(const Symbol::Ptr &descriptor) {
+    bool isValidDescriptor(const SymbolPtr &descriptor) {
         // TODO validate descriptor
         return true;
     }
@@ -156,41 +158,46 @@ namespace CCW::Tula {
                                   "Invalid super class index at %d", superClassIndex);
 
         // TODO resolved super class
-        auto interfacesCount = reader.readU16Unchecked();
-        reader.ensure(2 * interfacesCount);
-        auto interfaces = parseInterfaces(interfacesCount);
 
-        auto fieldsCount = reader.readU16Unchecked();
+        parseInterfaces();
+
+        parseFields();
 
         return nullptr;
     }
 
-    void ClassFileParser::parseFields() {
+    void ClassFileParser::parseFields() noexcept(false) {
         auto fieldCount = reader.readU16();
         auto isInterface = accessFlags & ClassAccessFlags::Interface;
         for (int i = 0; i < fieldCount; ++i) {
             reader.ensure(8);
             auto fieldAccessFlags = static_cast<FieldAccessFlags>(reader.readU16Unchecked());
-            if (fieldAccessFlags & FieldAccessFlags::Public) {
-                throwValidExceptionAssert(
-                    fieldAccessFlags & FieldAccessFlags::Protected || fieldAccessFlags & FieldAccessFlags::Private,
-                    "invalid field access flags %d", fieldAccessFlags);
-            } else if (fieldAccessFlags & FieldAccessFlags::Private) {
-                throwValidExceptionAssert(
-                    fieldAccessFlags & FieldAccessFlags::Protected || fieldAccessFlags & FieldAccessFlags::Public,
-                    "invalid field access flags %d", fieldAccessFlags);
-            } else if (fieldAccessFlags & FieldAccessFlags::Protected) {
-                throwValidExceptionAssert(
-                    fieldAccessFlags & FieldAccessFlags::Private || fieldAccessFlags & FieldAccessFlags::Public,
-                    "invalid field access flags %d", fieldAccessFlags);
-            }
-
             if (isInterface) {
                 throwValidExceptionAssert(
                     (fieldAccessFlags & FieldAccessFlags::Public)
                     && (fieldAccessFlags & FieldAccessFlags::Final)
                     && (fieldAccessFlags & FieldAccessFlags::Static),
                     "invalid field access flags %d in interface", fieldAccessFlags);
+            } else {
+                if (fieldAccessFlags & FieldAccessFlags::Public) {
+                    throwValidExceptionAssert(
+                        !(fieldAccessFlags & FieldAccessFlags::Protected ||
+                          fieldAccessFlags & FieldAccessFlags::Private),
+                        "invalid field access flags %d", fieldAccessFlags);
+                } else if (fieldAccessFlags & FieldAccessFlags::Private) {
+                    throwValidExceptionAssert(
+                        !(fieldAccessFlags & FieldAccessFlags::Protected ||
+                          fieldAccessFlags & FieldAccessFlags::Public),
+                        "invalid field access flags %d", fieldAccessFlags);
+                } else if (fieldAccessFlags & FieldAccessFlags::Protected) {
+                    throwValidExceptionAssert(
+                        !(fieldAccessFlags & FieldAccessFlags::Private || fieldAccessFlags & FieldAccessFlags::Public),
+                        "invalid field access flags %d", fieldAccessFlags);
+                }
+
+                throwValidExceptionAssert(
+                    !(fieldAccessFlags & FieldAccessFlags::Final || fieldAccessFlags & FieldAccessFlags::Volatile),
+                    "invalid field access flags %d", fieldAccessFlags);
             }
 
             auto nameIndex = reader.readU16Unchecked();
@@ -206,13 +213,14 @@ namespace CCW::Tula {
 
             parseFieldAttributes(fieldAccessFlags);
 
+            
         }
     }
 
     void ClassFileParser::parseFieldAttributes(FieldAccessFlags flags) {
 
-        std::optional<uint16_t> constValueIndex = nullopt;
-        std::optional<Symbol::Ptr> signature = nullopt;
+        std::optional<uint16_t> constValueIndex;
+        std::optional<SymbolPtr> signature;
         bool synthetic = false;
         bool deprecated = false;
         auto attributeCount = reader.readU16Unchecked();
@@ -223,10 +231,10 @@ namespace CCW::Tula {
                                       && cp->getTagAt(attrNameIndex).isUtf8(),
                                       "Invalid field attribute name index at %d", attrNameIndex);
 
-            u32 len = reader.readU32Unchecked();
+            uint32_t len = reader.readU32Unchecked();
             reader.ensure(len);
 
-            const Symbol::Ptr &attrName = cp->getSymbolAt(attrNameIndex);
+            const auto &attrName = cp->getSymbolAt(attrNameIndex);
             if (attrName->equals(ATTRIBUTE_ConstantValue)) {
                 if (flags & FieldAccessFlags::Static) {
                     throwValidExceptionAssert(len == 2, "Invalid constant value attr length %d", len);
@@ -247,113 +255,15 @@ namespace CCW::Tula {
             } else if (attrName->equals(ATTRIBUTE_Signature)) {
                 signature = parseSignatureAttribute(len);
             } else if (attrName->equals(ATTRIBUTE_RuntimeVisibleAnnotations)) {
-                auto annotationCount = reader.readU16Unchecked();
-                for (int j = 0; j < annotationCount; ++j) {
-                    reader.ensure(4);
-                    auto typeIndex = reader.readU16Unchecked();
-                    throwValidExceptionAssert(isValidCpIndex(typeIndex)
-                                              && cp->getTagAt(typeIndex).isUtf8(),
-                                              "Invalid runtime visible annotation type index at %d", typeIndex);
-                    auto elementValuePairCount = reader.readU16Unchecked();
-                    for (int k = 0; k < elementValuePairCount; ++k) {
-                        reader.ensure(3);
-                        auto elementNameIndex = reader.readU16Unchecked();
-                        throwValidExceptionAssert(isValidCpIndex(elementNameIndex)
-                                                  && cp->getTagAt(elementNameIndex).isUtf8(),
-                                                  "Invalid element name index at %d", elementNameIndex);
-                        auto tag = static_cast<ElementValueTag>(reader.readU8Unchecked());
-                        switch (tag) {
-                            case ElementValueTag::Byte: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isInteger(),
-                                                          "Invalid const value index at %d", cIndex);
-                                int32_t value = cp->getIntegerAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Char: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isInteger(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getIntegerAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Double: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isDouble(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getDoubleAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Float: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isFloat(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getFloatAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Int: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isInteger(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getIntegerAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Long: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isLong(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getLongAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Short: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isInteger(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getIntegerAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::Boolean: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isInteger(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getIntegerAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::String: {
-                                auto cIndex = reader.readU16();
-                                throwValidExceptionAssert(isValidCpIndex(cIndex)
-                                                          && cp->getTagAt(cIndex).isUtf8(),
-                                                          "Invalid const value index at %d", cIndex);
-                                auto value = cp->getSymbolAt(cIndex);
-                                break;
-                            }
-                            case ElementValueTag::EnumType:
-                                break;
-                            case ElementValueTag::Class:
-                                break;
-                            case ElementValueTag::AnnotationType:
-                                break;
-                            case ElementValueTag::ArrayType:
-                                break;
-                            default:
-                                throwParseException("Invalid element tag value");
-                        }
-                    }
-                }
-            } else if (attrName->equals(ATTRIBUTE_RuntimeInisibleAnnotations)) {
-                // TODO
+                /* auto annotations = */ parseAnnotations();
+            } else if (attrName->equals(ATTRIBUTE_RuntimeInvisibleAnnotations)) {
+                /* auto annotations = */ parseAnnotations();
             } else if (attrName->equals(ATTRIBUTE_RuntimeVisibleTypeAnnotations)) {
-                // TODO
+                // /* auto typeAnnotations = */ parseTypeAnnotations();
+                reader.skip(len);
             } else if (attrName->equals(ATTRIBUTE_RuntimeInvisibleTypeAnnotations)) {
-                // TODO
+                // /* auto typeAnnotations = */ parseTypeAnnotations();
+                reader.skip(len);
             } else {
                 reader.skip(len);
             }
@@ -361,7 +271,145 @@ namespace CCW::Tula {
         }
     }
 
-    const Symbol::Ptr &ClassFileParser::parseSignatureAttribute(u32 len) {
+    void ClassFileParser::parseAnnotations() noexcept(false) {
+        reader.ensure(2);
+        auto annotationCount = reader.readU16Unchecked();
+        for (int j = 0; j < annotationCount; ++j) {
+            parseAnnotation();
+        }
+    }
+
+    void ClassFileParser::parseAnnotation() noexcept(false) {
+        reader.ensure(4);
+        auto typeIndex = reader.readU16Unchecked();
+        throwValidExceptionAssert(isValidCpIndex(typeIndex)
+                                  && cp->getTagAt(typeIndex).isUtf8(),
+                                  "Invalid runtime visible annotation type index at %d", typeIndex);
+        auto elementValuePairCount = reader.readU16Unchecked();
+        for (int k = 0; k < elementValuePairCount; ++k) {
+            /*auto elementValue = */ parseElementValue();
+        }
+    }
+
+    void ClassFileParser::parseElementValue() noexcept(false) {
+        reader.ensure(3);
+        auto elementNameIndex = reader.readU16Unchecked();
+        throwValidExceptionAssert(isValidCpIndex(elementNameIndex)
+                                  && cp->getTagAt(elementNameIndex).isUtf8(),
+                                  "Invalid element name index at %d", elementNameIndex);
+        auto tagValue = reader.readU8Unchecked();
+        auto tag = static_cast<ElementValueTag>(tagValue);
+        switch (tag) {
+            case ElementValueTag::Byte: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isInteger(),
+                                          "Invalid const value index at %d", cIndex);
+                int32_t value = cp->getIntegerAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Char: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isInteger(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getIntegerAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Double: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isDouble(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getDoubleAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Float: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isFloat(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getFloatAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Int: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isInteger(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getIntegerAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Long: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isLong(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getLongAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Short: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isInteger(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getIntegerAt(cIndex);
+                break;
+            }
+            case ElementValueTag::Boolean: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isInteger(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getIntegerAt(cIndex);
+                break;
+            }
+            case ElementValueTag::String: {
+                auto cIndex = reader.readU16();
+                throwValidExceptionAssert(isValidCpIndex(cIndex)
+                                          && cp->getTagAt(cIndex).isUtf8(),
+                                          "Invalid const value index at %d", cIndex);
+                auto value = cp->getSymbolAt(cIndex);
+                break;
+            }
+            case ElementValueTag::EnumType: {
+                reader.ensure(4);
+                auto typeNameIndex = reader.readU16Unchecked();
+                auto constNameIndex = reader.readU16Unchecked();
+                throwValidExceptionAssert(
+                    isValidCpIndex(typeNameIndex) && cp->getTagAt(typeNameIndex).isUtf8(),
+                    "Invalid type name index at %d", typeNameIndex);
+                throwValidExceptionAssert(
+                    isValidCpIndex(constNameIndex) && cp->getTagAt(constNameIndex).isUtf8(),
+                    "Invalid const name index at %d", constNameIndex);
+                break;
+            }
+            case ElementValueTag::Class: {
+                reader.ensure(2);
+                auto classInfoIndex = reader.readU16Unchecked();
+                throwValidExceptionAssert(
+                    isValidCpIndex(classInfoIndex) && cp->getTagAt(classInfoIndex).isUtf8(),
+                    "Invalid class info index at %d", classInfoIndex);
+                break;
+            }
+            case ElementValueTag::AnnotationType: {
+                /* auto annotation = */ parseAnnotation();
+
+                break;
+            }
+            case ElementValueTag::ArrayType: {
+                auto valueCount = reader.readU16();
+                for (int i = 0; i < valueCount; i++) {
+                    /*auto elementValue = */ parseElementValue();
+                }
+                break;
+            }
+            default:
+                throwParseException("Invalid element tag value");
+        }
+    }
+
+    const SymbolPtr &ClassFileParser::parseSignatureAttribute(uint32_t len) {
         throwValidExceptionAssert(len == 2, "Invalid signature attr length %d", len);
         auto sigIndex = reader.readU16Unchecked();
         throwValidExceptionAssert(
@@ -374,21 +422,25 @@ namespace CCW::Tula {
 
     }
 
-    vector<uint16_t> ClassFileParser::parseInterfaces(uint16_t size) {
-        std::vector<uint16_t> interfaces(size);
-        for (int i = 0; i < size; ++i) {
+    void ClassFileParser::parseInterfaces() noexcept(false) {
+        CCW_ASSERT(interfaces.empty());
+
+        auto interfacesCount = reader.readU16Unchecked();
+        reader.ensure(2 * interfacesCount);
+        for (int i = 0; i < interfacesCount; ++i) {
             auto index = reader.readU16Unchecked();
             throwValidExceptionAssert(isValidCpIndex(index) && cp->getTagAt(index).isClassOrUnresolvedClass(),
                                       "Invalid interface index at %d", index);
             interfaces.push_back(index);
         }
-        return interfaces;
     }
 
-    shared_ptr<ConstantPool> ClassFileParser::parseConstantPool() noexcept(false) {
+    void ClassFileParser::parseConstantPool() noexcept(false) {
+        CCW_ASSERT(cp == nullptr);
+
         reader.ensure(3);
         auto cpSize = reader.readU16Unchecked();
-        this->cp = make_shared<ConstantPool>(cpSize);
+        cp = std::make_shared<ConstantPool>(cpSize);
         parseConstantPoolEntities();
 
         auto i = 0;
@@ -466,10 +518,13 @@ namespace CCW::Tula {
                                 "Invalid method reference index %d", kindValue);
                             break;
                         }
-                        case ReferenceKind::REF_invokeInterface:
+                        case ReferenceKind::REF_invokeInterface: {
                             throwValidExceptionAssert(cp->getTagAt(referenceIndex) == ConstantType::InterfaceMethodref,
                                                       "Invalid method reference index %d", kindValue);
                             break;
+                        }
+                        default:
+                            throwParseException("Invalid reference kind value %d", kindValue);
                     }
 
                 }
@@ -495,7 +550,7 @@ namespace CCW::Tula {
                     throwValidExceptionAssert(
                         isValidCpIndex(nameIndex) && cp->getTagAt(nameIndex) == ConstantType::Utf8,
                         "Invalid class name index at %d", nameIndex);
-                    const Symbol::Ptr &className = cp->getSymbolAt(nameIndex);
+                    const SymbolPtr &className = cp->getSymbolAt(nameIndex);
                     cp->putUnresolvedClassAt(i, className);
                     break;
                 }
@@ -504,92 +559,94 @@ namespace CCW::Tula {
                     throwValidExceptionAssert(
                         isValidCpIndex(stringIndex) && cp->getTagAt(stringIndex) == ConstantType::Utf8,
                         "Invalid string index at %d", stringIndex);
-                    const Symbol::Ptr &symbol = cp->getSymbolAt(stringIndex);
+                    const SymbolPtr &symbol = cp->getSymbolAt(stringIndex);
                     cp->putStringAt(i, symbol);
                     break;
                 }
                 case ConstantType::UnresolvedClass:
                     UNREACHABLE();
+                    return;
+                default:
+                    UNREACHABLE();
+                    return;
             }
         }
 
         // TODO validate cp
-
-        return cp;
     }
 
     void ClassFileParser::parseConstantPoolEntities() noexcept(false) {
-        u16 i = 0;
+        uint16_t i = 0;
         auto cpSize = cp->getSize();
         while (++i < cpSize) {
             auto tagValue = reader.readU8Unchecked();
-            switch (tagValue) {
-                case static_cast<uint8_t>(ConstantType::Class): {
+            switch (static_cast<ConstantType>(tagValue)) {
+                case ConstantType::Class: {
                     auto nameIndex = reader.readU16();
                     cp->putClassIndexAt(i, nameIndex);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Fieldref): {
+                case ConstantType::Fieldref: {
                     reader.ensure(5);
                     auto classIndex = reader.readU16Unchecked();
                     auto nameAndTypeIndex = reader.readU16Unchecked();
                     cp->putFieldRefAt(i, classIndex, nameAndTypeIndex);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Methodref): {
+                case ConstantType::Methodref: {
                     reader.ensure(5);
                     auto classIndex = reader.readU16Unchecked();
                     auto nameAndTypeIndex = reader.readU16Unchecked();
                     cp->putMethodRefAt(i, classIndex, nameAndTypeIndex);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::InterfaceMethodref): {
+                case ConstantType::InterfaceMethodref: {
                     reader.ensure(5);
                     auto classIndex = reader.readU16Unchecked();
                     auto nameAndTypeIndex = reader.readU16Unchecked();
                     cp->putInterfaceMethodRefAt(i, classIndex, nameAndTypeIndex);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::String): {
+                case ConstantType::String: {
                     reader.ensure(3);
                     auto index = reader.readU16Unchecked();
                     cp->putStringIndexAt(i, index);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Integer): {
+                case ConstantType::Integer: {
                     reader.ensure(5);
                     auto intValue = reader.readU32Unchecked();
                     cp->putIntegerAt(i, intValue);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Float): {
+                case ConstantType::Float: {
                     reader.ensure(5);
                     auto floatValue = reader.readU32Unchecked();
                     cp->putFloatAt(i, floatValue);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Long): {
+                case ConstantType::Long: {
                     reader.ensure(9);
                     auto bytes = reader.readU64Unchecked();
                     cp->putLongAt(i, bytes);
                     i++;
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Double): {
+                case ConstantType::Double: {
                     reader.ensure(9);
                     auto bytes = reader.readU64Unchecked();
                     cp->putDoubleAt(i, bytes);
                     i++;
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::NameAndType): {
+                case ConstantType::NameAndType: {
                     reader.ensure(5);
                     auto nameIndex = reader.readU16Unchecked();
                     auto descriptor = reader.readU16Unchecked();
                     cp->putNameAndTypeAt(i, nameIndex, descriptor);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::Utf8): {
+                case ConstantType::Utf8: {
                     auto len = reader.readU16();
                     reader.ensure(len + 1);
                     auto symbol = Symbol::create(reader.buffer(), len);
@@ -598,20 +655,20 @@ namespace CCW::Tula {
                     reader.skipUnchecked(len);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::MethodHandle): {
+                case ConstantType::MethodHandle: {
                     reader.ensure(4);
                     auto referenceKind = reader.readU8Unchecked();
                     auto referenceIndex = reader.readU16Unchecked();
                     cp->putMethodHandleAt(i, referenceKind, referenceIndex);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::MethodType): {
+                case ConstantType::MethodType: {
                     reader.ensure(3);
                     auto descriptorIndex = reader.readU16Unchecked();
                     cp->putMethodTypeAt(i, descriptorIndex);
                     break;
                 }
-                case static_cast<uint8_t>(ConstantType::InvokeDynamic): {
+                case ConstantType::InvokeDynamic: {
                     reader.ensure(5);
                     auto bootstrapMethodAttrIndex = reader.readU16Unchecked();
                     auto nameAndTypeIndex = reader.readU16Unchecked();
@@ -625,4 +682,7 @@ namespace CCW::Tula {
         }
     }
 
+    void ClassFileParser::parseTypeAnnotations() noexcept(false) {
+        // TODO
+    }
 }

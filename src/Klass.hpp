@@ -9,7 +9,7 @@ namespace CCW::Tula {
     public:
         using Ptr = std::shared_ptr<Klass>;
 
-        virtual const Symbol::Ptr &name() = 0;
+        virtual const SymbolPtr &name() = 0;
 
     private:
 

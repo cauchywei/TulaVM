@@ -79,19 +79,19 @@ namespace CCW::Tula {
 
     class ClassEntity {
     public:
-        explicit ClassEntity(Symbol::Ptr unresolvedClassName) : unresolvedClassName(std::move(unresolvedClassName)) {}
+        explicit ClassEntity(SymbolPtr unresolvedClassName) : unresolvedClassName(std::move(unresolvedClassName)) {}
 
         bool isUnresolved() {
             return unresolvedClassName != nullptr;
         }
 
-        const Symbol::Ptr &getUnresolvedClassName() {
+        const SymbolPtr &getUnresolvedClassName() {
             CCW_ASSERT(isUnresolved());
             return unresolvedClassName;
         }
 
     private:
-        Symbol::Ptr unresolvedClassName;
+        SymbolPtr unresolvedClassName;
     };
 
 
@@ -139,7 +139,7 @@ namespace CCW::Tula {
 
         uint16_t getStringIndexAt(uint16_t index);
 
-        void putStringAt(uint16_t index, const Symbol::Ptr &symbol);
+        void putStringAt(uint16_t index, const SymbolPtr &symbol);
 
         void putIntegerAt(uint16_t index, int32_t value);
 
@@ -163,9 +163,9 @@ namespace CCW::Tula {
 
         uint16_t getNameAndTypeDescriptorIndexAt(uint16_t index);
 
-        void putSymbolAt(uint16_t index, const Symbol::Ptr &symbol);
+        void putSymbolAt(uint16_t index, const SymbolPtr &symbol);
 
-        const Symbol::Ptr &getSymbolAt(uint16_t index);
+        const SymbolPtr &getSymbolAt(uint16_t index);
 
         void putMethodHandleAt(uint16_t index, uint8_t referenceKind, uint16_t referenceIndex);
 
@@ -183,7 +183,7 @@ namespace CCW::Tula {
 
         uint16_t getInvokeDynamicNameAndTypeIndexAt(uint16_t index);
 
-        void putUnresolvedClassAt(uint16_t index, const Symbol::Ptr &className);
+        void putUnresolvedClassAt(uint16_t index, const SymbolPtr &className);
 
         virtual ~ConstantPool();
 

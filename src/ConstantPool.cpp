@@ -74,9 +74,9 @@ namespace CCW::Tula {
         return entities[index];
     }
 
-    void ConstantPool::putStringAt(uint16_t index, const Symbol::Ptr &symbol) {
+    void ConstantPool::putStringAt(uint16_t index, const SymbolPtr &symbol) {
         putTagAt(index, ConstantType::String);
-        entities[index] = reinterpret_cast<intptr_t>(new Symbol::Ptr(symbol));
+        entities[index] = reinterpret_cast<intptr_t>(new SymbolPtr(symbol));
     }
 
     void ConstantPool::putIntegerAt(uint16_t index, jint value) {
@@ -137,15 +137,15 @@ namespace CCW::Tula {
         return entities[index];
     }
 
-    void ConstantPool::putSymbolAt(uint16_t index, const Symbol::Ptr &symbol) {
+    void ConstantPool::putSymbolAt(uint16_t index, const SymbolPtr &symbol) {
         putTagAt(index, ConstantType::Utf8);
-        entities[index] = reinterpret_cast<intptr_t>(new Symbol::Ptr(symbol));
+        entities[index] = reinterpret_cast<intptr_t>(new SymbolPtr(symbol));
     }
 
-    const Symbol::Ptr &ConstantPool::getSymbolAt(uint16_t index) {
+    const SymbolPtr &ConstantPool::getSymbolAt(uint16_t index) {
         auto tag = getTagAt(index);
         CCW_ASSERT(tag == ConstantType::Utf8);
-        return *((Symbol::Ptr *) entities[index]);
+        return *((SymbolPtr *) entities[index]);
     }
 
     void ConstantPool::putMethodHandleAt(uint16_t index, uint8_t referenceKind, uint16_t referenceIndex) {
@@ -190,9 +190,9 @@ namespace CCW::Tula {
         return entities[index];
     }
 
-    void ConstantPool::putUnresolvedClassAt(uint16_t index, const Symbol::Ptr &className) {
+    void ConstantPool::putUnresolvedClassAt(uint16_t index, const SymbolPtr &className) {
         putTagAtRelease(index, ConstantType::UnresolvedClass);
-        auto symbol = new Symbol::Ptr(className);
+        auto symbol = new SymbolPtr(className);
         auto *p = new ClassEntityInternal{};
         p->ptr.store((intptr_t) symbol, std::memory_order_release);
         entities[index] = reinterpret_cast<intptr_t>(p);
@@ -204,11 +204,11 @@ namespace CCW::Tula {
         auto *p = reinterpret_cast<ClassEntityInternal *>(entities[index]);
         if (tag == ConstantType::UnresolvedClass) {
             intptr_t ptr = p->ptr.load(std::memory_order_acquire);
-            return ClassEntity(*((Symbol::Ptr *) ptr));
+            return ClassEntity(*((SymbolPtr *) ptr));
         } else {
             // TODO return class
             intptr_t ptr = p->ptr.load(std::memory_order_acquire);
-            return ClassEntity(*((Symbol::Ptr *) ptr));
+            return ClassEntity(*((SymbolPtr *) ptr));
         }
     }
 

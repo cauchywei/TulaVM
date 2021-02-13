@@ -18,9 +18,9 @@ namespace CCW::Tula {
 
         virtual Klass::Ptr defineClass(const std::string &clazzPath) = 0;
 
-        virtual Klass::Ptr loadClass(const Symbol::Ptr &clazz) = 0;
+        virtual Klass::Ptr loadClass(const SymbolPtr &clazz) = 0;
 
-        virtual Klass::Ptr findClass(const Symbol::Ptr &clazz) = 0;
+        virtual Klass::Ptr findClass(const SymbolPtr &clazz) = 0;
     };
 
     class BootstrapClassLoader : public ClazzLoader {
@@ -31,11 +31,11 @@ namespace CCW::Tula {
 
         Klass::Ptr defineClass(const std::string &clazzPath) override;
 
-        Klass::Ptr loadClass(const Symbol::Ptr &clazz) override;
+        Klass::Ptr loadClass(const SymbolPtr &clazz) override;
 
-        Klass::Ptr findClass(const Symbol::Ptr &clazz) override;
+        Klass::Ptr findClass(const SymbolPtr &clazz) override;
 
-        Klass::Ptr findLoadedKlass(const Symbol::Ptr &clazz);
+        Klass::Ptr findLoadedKlass(const SymbolPtr &clazz);
 
     private:
         VM *vm;

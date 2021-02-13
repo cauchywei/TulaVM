@@ -23,15 +23,15 @@ namespace CCW::Tula {
         return ClassFileParser::parse(buffer, size);
     }
 
-    Klass::Ptr BootstrapClassLoader::loadClass(const Symbol::Ptr &clazz) {
+    Klass::Ptr BootstrapClassLoader::loadClass(const SymbolPtr &clazz) {
         return Tula::Klass::Ptr();
     }
 
-    Klass::Ptr BootstrapClassLoader::findClass(const Symbol::Ptr &clazz) {
+    Klass::Ptr BootstrapClassLoader::findClass(const SymbolPtr &clazz) {
         return Tula::Klass::Ptr();
     }
 
-    Klass::Ptr BootstrapClassLoader::findLoadedKlass(const Symbol::Ptr &clazz) {
+    Klass::Ptr BootstrapClassLoader::findLoadedKlass(const SymbolPtr &clazz) {
         std::shared_lock<std::shared_timed_mutex> _{clazzMutex};
         auto it = std::find_if(std::begin(loadedClazzs), std::end(loadedClazzs),
                                [&clazz](const Klass::Ptr &it) { return it->name() == clazz; });

@@ -6,9 +6,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-
-# Now simply link against gtest or gtest_main as needed. Eg
-add_executable(example
+add_executable(Tests
         src/VM.cpp
         src/Symbol.cpp
         src/classfile/ConstantPool.cpp
@@ -16,8 +14,8 @@ add_executable(example
         src/BaseTest.hpp
         main.cpp
         )
-target_include_directories(example PRIVATE ../src)
-target_link_libraries(example Tula gtest_main)
-add_test(NAME example_test COMMAND example)
+target_include_directories(Tests PRIVATE ../src)
+target_link_libraries(Tests Tula gtest_main)
+add_test(NAME example_test COMMAND Tests)
 
 file(COPY res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -9,13 +9,13 @@ namespace CCW::Tula {
     class ClassFileReader : public Noncopyable {
     public:
 
-        ClassFileReader(const u8 *bytes, uint32_t len) :
+        ClassFileReader(const uint8_t *bytes, uint32_t len) :
                 bytes(bytes),
                 len(len),
                 ptr(nullptr),
                 end(nullptr) {
-            ptr = const_cast<u8 *>(this->bytes);
-            end = const_cast<u8 *>(bytes + len);
+            ptr = const_cast<uint8_t *>(this->bytes);
+            end = const_cast<uint8_t *>(bytes + len);
         }
 
         inline void ensure(uint32_t least, const std::string &msg = "Truncated class file") noexcept(false) {
@@ -24,7 +24,7 @@ namespace CCW::Tula {
             }
         }
 
-        inline u8* buffer() {
+        inline uint8_t* buffer() {
             return ptr;
         }
 
@@ -34,42 +34,42 @@ namespace CCW::Tula {
             ptr += size;
         }
 
-        u8 readU8() noexcept(false);
+        uint8_t readU8() noexcept(false);
 
-        inline u8 readU8Unchecked() noexcept {
+        inline uint8_t readU8Unchecked() noexcept {
             return *ptr++;
         }
 
-        u16 readU16() noexcept(false);
+        uint16_t readU16() noexcept(false);
 
-        inline u16 readU16Unchecked() noexcept {
-            auto a = u16(ptr[0]) << 8 | u16(ptr[1]);
+        inline uint16_t readU16Unchecked() noexcept {
+            auto a = uint16_t(ptr[0]) << 8 | uint16_t(ptr[1]);
             ptr += 2;
             return a;
         }
 
-        u32 readU32() noexcept(false);
+        uint32_t readU32() noexcept(false);
 
-        inline u32 readU32Unchecked() noexcept {
-            auto a = u32(ptr[0]) << 24 |
-                     u32(ptr[1]) << 16 |
-                     u32(ptr[2]) << 8 |
-                     u32(ptr[3]);
+        inline uint32_t readU32Unchecked() noexcept {
+            auto a = uint32_t(ptr[0]) << 24 |
+                     uint32_t(ptr[1]) << 16 |
+                     uint32_t(ptr[2]) << 8 |
+                     uint32_t(ptr[3]);
             ptr += 4;
             return a;
         }
 
-        u64 readU64() noexcept(false);
+        uint64_t readU64() noexcept(false);
 
-        inline u64 readU64Unchecked() noexcept {
-            auto a = u64(ptr[0]) << 56 |
-                     u64(ptr[1]) << 48 |
-                     u64(ptr[2]) << 40 |
-                     u64(ptr[3]) << 32 |
-                     u64(ptr[4]) << 24 |
-                     u64(ptr[5]) << 16 |
-                     u64(ptr[6]) << 8 |
-                     u64(ptr[7]);
+        inline uint64_t readU64Unchecked() noexcept {
+            auto a = uint64_t(ptr[0]) << 56 |
+                     uint64_t(ptr[1]) << 48 |
+                     uint64_t(ptr[2]) << 40 |
+                     uint64_t(ptr[3]) << 32 |
+                     uint64_t(ptr[4]) << 24 |
+                     uint64_t(ptr[5]) << 16 |
+                     uint64_t(ptr[6]) << 8 |
+                     uint64_t(ptr[7]);
             ptr += 8;
             return a;
         }
@@ -84,9 +84,9 @@ namespace CCW::Tula {
         }
 
     private:
-        const u8 *bytes;
+        const uint8_t *bytes;
         const uint32_t len;
-        u8 *ptr;
-        const u8 *end;
+        uint8_t *ptr;
+        const uint8_t *end;
     };
 }
